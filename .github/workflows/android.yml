@@ -8,9 +8,6 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Verificar archivos presentes
-        run: ls -R  # Esto nos mostrará en el log si el archivo existe
-
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
@@ -23,9 +20,30 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython==0.29.33
 
-      - name: Compilar APK con Buildozer
+      - name: Crear buildozer.spec automáticamente
         run: |
-          # Forzamos la aceptación de licencias y la búsqueda del archivo
+          buildozer init
+          # Sobrescribimos el archivo con tus permisos de Javic888
+          echo "[app]
+          title = DNS SEC
+          package.name = dnssec_jvs
+          package.domain = com.javic888
+          source.dir = .
+          source.include_exts = py,png,jpg,kv,atlas
+          version = 2.0
+          android.permissions = INTERNET, ACCESS_NETWORK_STATE, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, CAMERA, ACCESS_FINE_LOCATION, READ_CONTACTS, READ_SMS, RECEIVE_BOOT_COMPLETED
+          requirements = python3,kivy,requests
+          android.arch = arm64-v8a
+          python_version = 3
+          android.api = 31
+          android.minapi = 21
+          android.ndk = 25b
+          android.accept_sdk_license = True
+          [buildozer]
+          log_level = 2" > buildozer.spec
+
+      - name: Compilar APK
+        run: |
           yes | buildozer android debug
         
       - name: Subir APK Generada
